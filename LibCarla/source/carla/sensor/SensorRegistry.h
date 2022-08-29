@@ -27,6 +27,9 @@
 #include "carla/sensor/s11n/RadarSerializer.h"
 #include "carla/sensor/s11n/SemanticLidarSerializer.h"
 
+//2022.08.23 Xinyi Li: Driver Unit
+#include "carla/sensor/s11n/DriverTestSerializer.h"
+
 // 2. Add a forward-declaration of the sensor here.
 class ACollisionSensor;
 class ADepthCamera;
@@ -44,6 +47,9 @@ class ASemanticSegmentationCamera;
 class AInstanceSegmentationCamera;
 class ARssSensor;
 class FWorldObserver;
+
+////2022.08.23 Xinyi Li: Driver Unit
+class ADriverUnitTest;
 
 namespace carla {
 namespace sensor {
@@ -71,7 +77,10 @@ namespace sensor {
     std::pair<ASceneCaptureCamera *, s11n::ImageSerializer>,
     std::pair<ASemanticSegmentationCamera *, s11n::ImageSerializer>,
     std::pair<AInstanceSegmentationCamera *, s11n::ImageSerializer>,
-    std::pair<FWorldObserver *, s11n::EpisodeStateSerializer>
+    std::pair<FWorldObserver *, s11n::EpisodeStateSerializer>,
+
+    //2022.08.23 Xinyi Li: Driver Unit
+    std::pair<ADriverUnitTest *, s11n::DriverTestSerializer>
   >;
 
 } // namespace sensor
@@ -98,5 +107,8 @@ namespace sensor {
 #include "Carla/Sensor/SemanticSegmentationCamera.h"
 #include "Carla/Sensor/InstanceSegmentationCamera.h"
 #include "Carla/Sensor/WorldObserver.h"
+
+//2022.08.23 Xinyi Li: Driver Unit
+#include "Carla/Sensor/DriverUnitTest.h"
 
 #endif // LIBCARLA_SENSOR_REGISTRY_WITH_SENSOR_INCLUDES

@@ -23,6 +23,9 @@
 
 #include <carla/sensor/data/RadarData.h>
 
+// 2022.08.23 include the Driver Unit
+#include <carla/sensor/data/DriverBreakingEvent.h>
+
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include <ostream>
@@ -162,6 +165,16 @@ namespace data {
         << ", cos_inc_angle=" << std::to_string(det.cos_inc_angle)
         << ", object_idx=" << std::to_string(det.object_idx)
         << ", object_tag=" << std::to_string(det.object_tag)
+        << ')';
+    return out;
+  }
+
+  // 2022.08.23 Xinyi Li: for Driver Unit
+  std::ostream &operator<<(std::ostream &out, const DriverBreakingEvent &meas) {
+    out << "DriverBreakingEvent(frame=" << std::to_string(meas.GetFrame())
+        << ", timestamp=" << std::to_string(meas.GetTimestamp())
+        << ", reaction_time=" << std::to_string(meas.GetReactionTime())
+        << ", breaking_ratio=" << std::to_string(meas.GetBreakingRatio())
         << ')';
     return out;
   }
@@ -553,6 +566,13 @@ void export_sensor_data() {
     .def("to_array_y", CALL_RETURNING_LIST(csd::DVSEventArray, ToArrayY))
     .def("to_array_t", CALL_RETURNING_LIST(csd::DVSEventArray, ToArrayT))
     .def("to_array_pol", CALL_RETURNING_LIST(csd::DVSEventArray, ToArrayPol))
+    .def(self_ns::str(self_ns::self))
+  ;
+
+  // 2022.08.23 Xinyi Li: for Driver Unit
+  class_<csd::DriverBreakingEvent, bases<cs::SensorData>, boost::noncopyable, boost::shared_ptr<csd::DriverBreakingEvent>>("DriverBreakingEvent", no_init)
+    .add_property("reaction_time", &csd::DriverBreakingEvent::GetReactionTime)
+    .add_property("breaking_ratio", &csd::DriverBreakingEvent::GetBreakingRatio)
     .def(self_ns::str(self_ns::self))
   ;
 }
