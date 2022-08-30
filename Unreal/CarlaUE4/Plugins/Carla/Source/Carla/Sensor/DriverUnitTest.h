@@ -39,9 +39,13 @@ public:
 
     float Rmin;
     
-    bool reaction_rand;
+    bool reaction_random;
     
     float reaction_fix;
+
+    bool braking_random;
+
+    float braking_fix;
     
   
 

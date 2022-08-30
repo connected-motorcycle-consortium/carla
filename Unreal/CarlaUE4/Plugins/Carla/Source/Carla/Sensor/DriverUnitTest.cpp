@@ -29,43 +29,65 @@ FActorDefinition ADriverUnitTest::GetSensorDefinition()
       TEXT("driver"));
 
   // create sensor attributes which can be configured by the user at Python API
-  // Attribute 1: maximal driver reaction time (float)
-  // Attribute 2: minimal driver reaction time (float)
+  // Attribute 1: maximum of driver reaction time (float)
+  // Attribute 2: minimum of driver reaction time (float)
   // Attribute 3: sensor_tick (float)
-  // Attribute 4: if the reaction time should be randomized or not (bool)
+  // Attribute 4: if the reaction time should be randomly generated or not (bool)
+  // Attribute 5: if reaction time is not generated randomly, a fixed reaction time should be set (float)
+  // Attribute 6: if the braking ratio should be randomly generated or not (bool)
+  // Attribute 7: if braking ratio is not generated randomly, a fixed braking ratio should be set (float)
 
-  FActorVariation Reaction_max;
-  Reaction_max.Id = TEXT("reaction_time_max");
-  Reaction_max.Type = EActorAttributeType::Float;
-  Reaction_max.RecommendedValues = { TEXT("5.0") };
-  Reaction_max.bRestrictToRecommended = false;
+  // Attribute 1
+  FActorVariation ReactionTimeMax;
+  ReactionTimeMax.Id = TEXT("reaction_time_max");
+  ReactionTimeMax.Type = EActorAttributeType::Float;
+  ReactionTimeMax.RecommendedValues = { TEXT("5.0") };
+  ReactionTimeMax.bRestrictToRecommended = false;
 
-  FActorVariation Reaction_min;
-  Reaction_min.Id = TEXT("reaction_time_min");
-  Reaction_min.Type = EActorAttributeType::Float;
-  Reaction_min.RecommendedValues = { TEXT("0.0") };
-  Reaction_min.bRestrictToRecommended = false;
-
+  // Attribute 2
+  FActorVariation ReactionTimeMin;
+  ReactionTimeMin.Id = TEXT("reaction_time_min");
+  ReactionTimeMin.Type = EActorAttributeType::Float;
+  ReactionTimeMin.RecommendedValues = { TEXT("0.0") };
+  ReactionTimeMin.bRestrictToRecommended = false;
+  
+  // Attribute 3
   FActorVariation Tick;
   Tick.Id = TEXT("sensor_tick");
   Tick.Type = EActorAttributeType::Float;
   Tick.RecommendedValues = { TEXT("0.0") };
   Tick.bRestrictToRecommended = false;
 
-  FActorVariation IsRandom;
-  IsRandom.Id = TEXT("reaction_time_randomize");
-  IsRandom.Type = EActorAttributeType::Bool;
-  IsRandom.RecommendedValues = { TEXT("true") };
-  IsRandom.bRestrictToRecommended = false;
+  // Attribute 4
+  FActorVariation ReactionTimeIsRandom;
+  ReactionTimeIsRandom.Id = TEXT("reaction_time_random");
+  ReactionTimeIsRandom.Type = EActorAttributeType::Bool;
+  ReactionTimeIsRandom.RecommendedValues = { TEXT("true") };
+  ReactionTimeIsRandom.bRestrictToRecommended = false;
 
-  FActorVariation Reaction_Fix;
-  Reaction_Fix.Id = TEXT("reaction_time_Fix");
-  Reaction_Fix.Type = EActorAttributeType::Float;
-  Reaction_Fix.RecommendedValues = { TEXT("0.0") };
-  Reaction_Fix.bRestrictToRecommended = false;
+  //Attribute 5
+  FActorVariation ReactionTimeFix;
+  ReactionTimeFix.Id = TEXT("reaction_time_fix");
+  ReactionTimeFix.Type = EActorAttributeType::Float;
+  ReactionTimeFix.RecommendedValues = { TEXT("0.0") };
+  ReactionTimeFix.bRestrictToRecommended = false;
+
+  // Attribute 6
+  FActorVariation BrakingRatioIsRandom;
+  BrakingRatioIsRandom.Id = TEXT("braking_ratio_random");
+  BrakingRatioIsRandom.Type = EActorAttributeType::Bool;
+  BrakingRatioIsRandom.RecommendedValues = { TEXT("true") };
+  BrakingRatioIsRandom.bRestrictToRecommended = false;
+
+  //Attribute 7
+  FActorVariation BrakingRatioFix;
+  BrakingRatioFix.Id = TEXT("braking_ratio_fix");
+  BrakingRatioFix.Type = EActorAttributeType::Float;
+  BrakingRatioFix.RecommendedValues = { TEXT("0.0") };
+  BrakingRatioFix.bRestrictToRecommended = false;
 
 
-  Definition.Variations.Append({Reaction_max, Reaction_min,Tick,IsRandom,Reaction_Fix});
+  Definition.Variations.Append({ReactionTimeMax, ReactionTimeMin, Tick, ReactionTimeIsRandom, ReactionTimeFix, BrakingRatioIsRandom, BrakingRatioFix});
   
   return Definition;
 }
@@ -74,29 +96,41 @@ void ADriverUnitTest::Set(const FActorDescription &Description)
 {
   Super::Set(Description);
 
-  const bool reaction_random = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToBool(
-      "reaction_time_randomize",
+  const bool ReactionRandom = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToBool(
+      "reaction_time_random",
       Description.Variations,
       true);
 
-  const float Reaction_max = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
+  const float ReactionMax = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
       "reaction_time_max",
       Description.Variations,
       5.0f);
-  const float Reaction_min = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
+  const float ReactionMin = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
       "reaction_time_min",
       Description.Variations,
       0.0f);
-  const float Reaction_Fix = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
-      "reaction_time_Fix",
+  const float ReactionFix = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
+      "reaction_time_fix",
+      Description.Variations,
+      0.0f);
+
+  const bool BrakingRandom = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToBool(
+      "braking_ratio_random",
+      Description.Variations,
+      true);
+
+  const float BrakingFix = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
+      "braking_ratio_fix",
       Description.Variations,
       0.0f);
 
 
-  Rmax = Reaction_max;
-  Rmin = Reaction_min;
-  reaction_rand = reaction_random;
-  reaction_fix = Reaction_Fix;
+  Rmax = ReactionMax ;
+  Rmin = ReactionMin;
+  reaction_random = ReactionRandom;
+  reaction_fix = ReactionFix;
+  braking_random = BrakingRandom;
+  braking_fix = BrakingFix;
   
   
  
@@ -104,17 +138,17 @@ void ADriverUnitTest::Set(const FActorDescription &Description)
 
 float ADriverUnitTest::ComputeReactionTime()
 {
-    float reaction_time;
+  float reaction_time;
 
-    if (reaction_rand == false)
-    {
-        reaction_time = reaction_fix;
-    }
-    else
-    {
-        const float reaction_range = Rmax - Rmin;
-        reaction_time = Rmin + static_cast<float>(rand()) * static_cast<float>(reaction_range) / RAND_MAX;
-    }
+  if (reaction_random == false)
+  {
+    reaction_time = reaction_fix;
+  }
+  else
+  {
+    const float reaction_range = Rmax - Rmin;
+    reaction_time = Rmin + static_cast<float>(rand()) * static_cast<float>(reaction_range) / RAND_MAX;
+  }
    
   return reaction_time;
   
@@ -123,13 +157,14 @@ float ADriverUnitTest::ComputeReactionTime()
 float ADriverUnitTest::ComputeBraking()
 {
   float brake_ratio;
-  if (reaction_rand == false && reaction_fix == 0.0f)
+
+  if (braking_random == false)
   {
-      brake_ratio = 0.0f;
+    brake_ratio = braking_fix;
   }
-  else
+  else 
   {
-      brake_ratio = rand() / static_cast<float>(RAND_MAX);
+    brake_ratio = rand() / static_cast<float>(RAND_MAX);
   }
   
   return brake_ratio;
