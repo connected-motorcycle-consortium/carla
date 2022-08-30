@@ -29,8 +29,10 @@ FActorDefinition ADriverUnitTest::GetSensorDefinition()
       TEXT("driver"));
 
   // create sensor attributes which can be configured by the user at Python API
-  // Attribute 1: maximal driver reaction time
-  // Attribute 2: minimal driver reaction time
+  // Attribute 1: maximal driver reaction time (float)
+  // Attribute 2: minimal driver reaction time (float)
+  // Attribute 3: sensor_tick (float)
+  // Attribute 4: if the reaction time should be randomized or not (bool)
 
   FActorVariation Reaction_max;
   Reaction_max.Id = TEXT("reaction_time_max");
@@ -44,7 +46,26 @@ FActorDefinition ADriverUnitTest::GetSensorDefinition()
   Reaction_min.RecommendedValues = { TEXT("0.0") };
   Reaction_min.bRestrictToRecommended = false;
 
-  Definition.Variations.Append({Reaction_max, Reaction_min});
+  FActorVariation Tick;
+  Tick.Id = TEXT("sensor_tick");
+  Tick.Type = EActorAttributeType::Float;
+  Tick.RecommendedValues = { TEXT("0.0") };
+  Tick.bRestrictToRecommended = false;
+
+  FActorVariation IsRandom;
+  IsRandom.Id = TEXT("reaction_time_randomize");
+  IsRandom.Type = EActorAttributeType::Bool;
+  IsRandom.RecommendedValues = { TEXT("true") };
+  IsRandom.bRestrictToRecommended = false;
+
+  FActorVariation Reaction_Fix;
+  Reaction_Fix.Id = TEXT("reaction_time_Fix");
+  Reaction_Fix.Type = EActorAttributeType::Float;
+  Reaction_Fix.RecommendedValues = { TEXT("0.0") };
+  Reaction_Fix.bRestrictToRecommended = false;
+
+
+  Definition.Variations.Append({Reaction_max, Reaction_min,Tick,IsRandom,Reaction_Fix});
   
   return Definition;
 }
@@ -52,6 +73,11 @@ FActorDefinition ADriverUnitTest::GetSensorDefinition()
 void ADriverUnitTest::Set(const FActorDescription &Description)
 {
   Super::Set(Description);
+
+  const bool reaction_random = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToBool(
+      "reaction_time_randomize",
+      Description.Variations,
+      true);
 
   const float Reaction_max = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
       "reaction_time_max",
@@ -61,12 +87,16 @@ void ADriverUnitTest::Set(const FActorDescription &Description)
       "reaction_time_min",
       Description.Variations,
       0.0f);
+  const float Reaction_Fix = UActorBlueprintFunctionLibrary::RetrieveActorAttributeToFloat(
+      "reaction_time_Fix",
+      Description.Variations,
+      0.0f);
+
 
   Rmax = Reaction_max;
   Rmin = Reaction_min;
-
-  std::cout<<"eingestellte maximale Reaktionszeit: "+std::to_string(Rmax)+"\n";
-  std::cout<<"eingestellte minimale Reaktionszeit: "+std::to_string(Rmin)+"\n";
+  reaction_rand = reaction_random;
+  reaction_fix = Reaction_Fix;
   
   
  
@@ -74,18 +104,35 @@ void ADriverUnitTest::Set(const FActorDescription &Description)
 
 float ADriverUnitTest::ComputeReactionTime()
 {
-  
-  const float reaction_range = Rmax - Rmin;
-  const float reaction_time = Rmin + static_cast<float>(rand()) * static_cast<float>(reaction_range) / RAND_MAX;
+    float reaction_time;
+
+    if (reaction_rand == false)
+    {
+        reaction_time = reaction_fix;
+    }
+    else
+    {
+        const float reaction_range = Rmax - Rmin;
+        reaction_time = Rmin + static_cast<float>(rand()) * static_cast<float>(reaction_range) / RAND_MAX;
+    }
+   
   return reaction_time;
   
 }
 
-float ADriverUnitTest::ComputeBreaking()
+float ADriverUnitTest::ComputeBraking()
 {
+  float brake_ratio;
+  if (reaction_rand == false && reaction_fix == 0.0f)
+  {
+      brake_ratio = 0.0f;
+  }
+  else
+  {
+      brake_ratio = rand() / static_cast<float>(RAND_MAX);
+  }
   
-  const float break_ratio = rand() / static_cast<float>(RAND_MAX);
-  return break_ratio;
+  return brake_ratio;
 
 }
 
@@ -107,7 +154,7 @@ void ADriverUnitTest::PostPhysTick(UWorld *World, ELevelTick TickType, float Del
     
 
     auto Stream = GetDataStream(*this);
-    Stream.Send(*this, ComputeReactionTime(), ComputeBreaking());
+    Stream.Send(*this, ComputeReactionTime(), ComputeBraking());
     
   
 }

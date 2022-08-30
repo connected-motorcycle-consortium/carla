@@ -33,11 +33,15 @@ public:
 
     float ComputeReactionTime();
 
-    float ComputeBreaking();
+    float ComputeBraking();
 
     float Rmax;
 
     float Rmin;
+    
+    bool reaction_rand;
+    
+    float reaction_fix;
     
   
 

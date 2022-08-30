@@ -19,15 +19,15 @@ namespace s11n {
     public:
       struct Data{
         float reactiontime;
-        float breakingratio;
-        MSGPACK_DEFINE_ARRAY(reactiontime, breakingratio)
+        float brakingratio;
+        MSGPACK_DEFINE_ARRAY(reactiontime, brakingratio)
       };
     
       template <typename SensorT>
       static Buffer Serialize(
         const SensorT &sensor,
         const float reactionTime,
-        const float breakingRatio);
+        const float brakingRatio);
     
       static Data DeserializeRawData(const RawData& message) {
         return MsgPack::UnPack<Data>(message.begin(), message.size());
@@ -40,8 +40,8 @@ namespace s11n {
   inline Buffer DriverTestSerializer::Serialize(
       const SensorT &sensor,
       const float reactionTime,
-      const float breakingRatio) {
-      return MsgPack::Pack(Data{reactionTime,breakingRatio});
+      const float brakingRatio) {
+      return MsgPack::Pack(Data{reactionTime,brakingRatio});
   }
 
 } // namespace s11n

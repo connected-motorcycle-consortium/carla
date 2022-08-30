@@ -7,7 +7,7 @@ namespace carla {
 namespace sensor {
 namespace data {
 
-  class DriverBreakingEvent : public SensorData {
+  class DriverBrakingEvent : public SensorData {
   public:
 
     using Super = SensorData;
@@ -17,13 +17,13 @@ namespace data {
     friend Serializer;
 
     float _reactionTime;
-    float _breakingRatio;
+    float _brakingRatio;
 
 
-    explicit DriverBreakingEvent(const RawData &&data)
+    explicit DriverBrakingEvent(const RawData &&data)
       : Super(data),
        _reactionTime(Serializer::DeserializeRawData(data).reactiontime),
-       _breakingRatio(Serializer::DeserializeRawData(data).breakingratio){}
+       _brakingRatio(Serializer::DeserializeRawData(data).brakingratio){}
        
 
  
@@ -33,8 +33,8 @@ namespace data {
     }
 
 
-    float GetBreakingRatio() const {
-      return _breakingRatio;
+    float GetBrakingRatio() const {
+      return _brakingRatio;
     }
 
   
