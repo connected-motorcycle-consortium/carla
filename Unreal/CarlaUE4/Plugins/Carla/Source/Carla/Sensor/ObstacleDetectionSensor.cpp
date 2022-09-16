@@ -95,7 +95,9 @@ void AObstacleDetectionSensor::PostPhysTick(UWorld *World, ELevelTick TickType, 
   {
     // If we go only for dynamics, we check the object type AllDynamicObjects
     FCollisionObjectQueryParams TraceChannel = FCollisionObjectQueryParams(
-        FCollisionObjectQueryParams::AllDynamicObjects);
+    //  FCollisionObjectQueryParams::AllDynamicObjects);
+        ECC_WorldDynamic);
+
     isHitReturned = CurrentWorld->SweepSingleByObjectType(
         HitOut,
         Start,

@@ -17,6 +17,8 @@
 
 #include <limits>
 
+#include <iostream>
+
 // Based on OpenDRIVE's lon and lat
 const FVector AInertialMeasurementUnit::CarlaNorthVector =
     FVector(0.0f, -1.0f, 0.0f);
@@ -178,6 +180,7 @@ float AInertialMeasurementUnit::ComputeCompass()
   if (FVector::CrossProduct(CarlaNorthVector, ForwVect).Z < 0.0f)
     return carla::geom::Math::Pi2<float>() - Compass;
 
+  std::cout<<"Compass returned!"<<std::endl;
   return Compass;
 }
 

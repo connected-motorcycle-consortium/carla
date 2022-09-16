@@ -1,6 +1,7 @@
-//DriverUnitTest (Sensor)
-
-//2022.08.19 Xinyi Li V1.0
+// Copyright (c) 2022 Connected Motorcycle Consortium (CMC).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
