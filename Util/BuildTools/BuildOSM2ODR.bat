@@ -100,8 +100,8 @@ if %BUILD_OSM2ODR% == true (
         -DCMAKE_INSTALL_PREFIX="%OSM2ODR_INSTALL_PATH:\=/%"^
         -DPROJ_INCLUDE_DIR=%INSTALLATION_DIR:/=\%\proj-install\include^
         -DPROJ_LIBRARY=%INSTALLATION_DIR:/=\%\proj-install\lib\proj.lib^
-        -DXercesC_INCLUDE_DIR=%INSTALLATION_DIR:/=\%\xerces-c-3.2.3-install\include^
-        -DXercesC_LIBRARY=%INSTALLATION_DIR:/=\%\xerces-c-3.2.3-install\lib\xerces-c.lib^
+        -DXercesC_INCLUDE_DIR=%INSTALLATION_DIR:/=\%\xerces-c-3.2.4-install\include^
+        -DXercesC_LIBRARY=%INSTALLATION_DIR:/=\%\xerces-c-3.2.4-install\lib\xerces-c.lib^
         "%OSM2ODR_SOURCE_PATH%"
     if %errorlevel% neq 0 goto error_cmake
 
